@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMDb</title>
+    <style>
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            background-color: rgb(44, 43, 43);
+
+        }
+        .container{
+            background-color: rgb(44, 43, 43);
+            width:70%;
+            height:100vh;
+            /* border:2px solid purple; */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: 200;
+            color: rgb(226, 40, 40);
+        }
+        h1{
+            /* width: 900%; */
+            /* font-size: 100%; */
+            /* border:2px solid red; */
+            text-align: center;
+        }
+       .searchbar{
+        /* border:2px solid red; */
+        width: 90%;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        
+       }
+       #sb{
+           height: 80%;
+           width: 45%;
+           border: 1px solid rgb(201, 199, 199);
+           margin: 15px;
+           border-radius: 9px;
+           font-size: 50%;
+           background-color: rgb(44, 43, 43);
+           color: white;
+       }
+       #btn{
+        height: 93%;
+        width: 10%;
+        font-size: 56%;
+        border: 1px solid rgb(201, 199, 199);
+        border-radius: 9px;
+        /* background-color: rgb(44, 43, 43); */
+       }
+       .mov{
+           border:2px solid grey;
+           width: 95%;
+           display: block;
+           /* height:100vh; */
+           display: flex;
+           flex-direction: row;
+           background-color: rgb(139, 137, 137);
+           border-radius: 8px;
+           box-shadow: 7px 7px 10px black;
+       }
+       .mov img{
+           height:350px;
+           width: 33%;
+           padding:14px;
+       }
+       .desc{
+            width: 67%;
+            height:350px;
+            padding: 6px;
+            /* border: 2px solid purple; */
+            color: black;
+            /* text-shadow: 2px 2px; */
+            
+       }
+       .desc h2{
+        margin:2px;
+        padding:8px;
+        font-size: 100%;
+       }
+       .desc p{
+        margin:4px;
+        padding:3px;
+        font-size: 22px;
+        margin-left: 11px;
+       }
+       .desc hr{
+           width:70%;
+           margin: 4px;
+           padding: 0px;
+           margin-left: 11px;
+           border: 1px solid rgb(196, 66, 66);
+       }
+       /* .message{
+           width:50%;
+           border: 2px solid purple;
+           margin:0%; */
+       
+       .message h1{
+           color: white;
+       }
+       #recom{
+           margin: 0%;
+           display: flex;
+           /* border: 2px solid green; */
+           flex-direction: row-reverse;
+       }
+       #recom h6{
+        margin: 0%;
+        background-color: yellow;
+        color: black;
+        border-radius: 0px 8px 0px 8px;
+        padding: 5px;
+       }
+    </style>
+</head>
+<body>
+    <div class="container" id="cont">
+        <h1>Welcome To OMDb</h1>
+        <div class="searchbar">
+            <input type="text" id="sb" placeholder="Enter Movie Name" />
+            <button id="btn" onclick="getdata()">Search</button>
+        </div>
+    </div>
+</body>
+<script>
+    var cont = document.getElementById("cont");
+    async  function getdata(){
+        // var bdy = document.getElementsByTagName("body");
+        
+        
+        var movie = document.getElementById("sb").value;
+        var API_KEY = "95a612c9";
+        // console.log(movie);
+        let res = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&t=${movie}`);
+        let data = await res.json();
+        cont.innerHTML="";
+        // console.log(data);
+        if(data.Response == 'False'){
+           displayGif();
+        }
+        else{
+        displaydata(data);
+        }
+    }
+    
+    function displaydata(data){
+        console.log(data);
+        var mov = document.createElement("div");
+        mov.setAttribute("class","mov");
+        cont.append(mov);
+        let image = document.createElement("img");
+        image.src = data.Poster;
+        mov.append(image);
+        var desc = document.createElement("div");
+        desc.setAttribute("class","desc");
+        mov.append(desc);
+        var title = document.createElement("div");
+        title.innerHTML=`<h2>${data.Title}</h2>`;
+        var line = document.createElement("hr");
+        var year = document.createElement("div");
+        year.innerHTML=`<h5>Year: </h5><p>${data.Year}</p>`;
+        var genre = document.createElement("div");
+        genre.innerHTML = `<p>Genre: ${data.Genre}</p>`;
+        var released = document.createElement("div");
+        released.innerHTML=`<p>Release Date: ${data.Released}</p>`;
+        var runtime = document.createElement("div");
+        runtime.innerHTML=`<p> Duration : ${data.Runtime}</p>`;
+        var ratings = document.createElement("div");
+        var imdb = data.Ratings[0].Value;
+        imdb = parseFloat(imdb);
+        // var rottentom = data.Ratings[1].Value;
+        ratings.innerHTML=`<p>Ratings: imdb: ${imdb}</p>`;
+        var plot = document.createElement("div");
+        plot.innerHTML=`<p>Plot: ${data.Plot}</p>`;
+        if(imdb>8.5){
+            let recommend = document.createElement("div");
+
+            recommend.innerHTML="<h6> Recommended </h6>";
+            recommend.setAttribute("id","recom");
+            // desc.append(title,recommend,line,genre,released,ratings,runtime,plot);
+            desc.append(recommend);
+        }
+        // else{
+        desc.append(title,line,genre,released,ratings,runtime,plot);
+        // }
+
+    }
+    function displayGif(){
+        let message = document.createElement("div");
+        message.setAttribute("class", "message" );
+        message.innerHTML=`<h1>No results Found Please try again!!!</h1>`;
+
+        let gif = document.createElement("img");
+        gif.src = "https://media3.giphy.com/media/H88IyldqT6hHCt3E4F/200.gif";
+
+
+        cont.append(message,gif);
+    }
+</script>
+</html>
